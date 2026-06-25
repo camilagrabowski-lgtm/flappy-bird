@@ -34,7 +34,7 @@ export default function Home() {
           </TouchableOpacity>
         </Link>
         <Image
-          source={require("../assets/images/bird.webp")}
+          source={require("../assets/images/brind.gif")}
           style={styles.bird}
         />
 
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 100,
     fontWeight: "900",
     lineHeight: 100,
+    color: "yellow",
   },
   bird: {
     width: 70,
