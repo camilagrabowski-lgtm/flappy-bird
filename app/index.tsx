@@ -1,27 +1,32 @@
+import GradientText from "@/components/GradientText";
+import MovingBackground from "@/components/MovingBackground";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  Image,
   ImageBackground,
   StyleSheet,
   Text,
   TouchableOpacity,
-  Image,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import MovingBackground from "@/components/MovingBackground";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   return (
     <ImageBackground
-      source={require("../assets/images/background.png.avif")}
+      source={require("../assets/images/background.png")}
       resizeMode="cover"
       style={styles.background}
     >
       <SafeAreaView style={styles.screen}>
-        <Text style={styles.title}>
-          <Text style={styles.title}>FLAPPY{"\n"}</Text>
-          <Text style={styles.title}>BIRD{"\n"}</Text>
-        </Text>
+        <GradientText
+          colors={["#FF8A00", "#FFD600"]}
+          style={styles.title}
+          start={[0, 0]}
+          end={[1, 1]}
+        >
+          Flappy Bird
+        </GradientText>
 
         <Link href="/play" asChild>
           <TouchableOpacity style={styles.button}>
@@ -33,11 +38,11 @@ export default function Home() {
             </LinearGradient>
           </TouchableOpacity>
         </Link>
+
         <Image
           source={require("../assets/images/brind.gif")}
           style={styles.bird}
         />
-
       </SafeAreaView>
       <MovingBackground />
     </ImageBackground>
@@ -46,49 +51,51 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
   },
-
   screen: {
-    flex: 1,
-    justifyContent: "flex-start",
+    width: "100%",
+    height: "100%",
     alignItems: "center",
   },
-
+  title: {
+    fontSize: 50,
+    fontWeight: "bold",
+    marginTop: 30,
+    fontFamily: "LuckiestGuy",
+    textShadowColor: "rgba(0, 0, 0, 0.5)",
+    textShadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    textShadowRadius: 0,
+    paddingRight: 3,
+  },
   button: {
+    borderRadius: 100,
     position: "absolute",
     top: "50%",
-    borderRadius: 100,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 3,
+    elevation: 3,
   },
-
   buttonGradient: {
-    paddingHorizontal: 40,
-    paddingVertical: 15,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    width: "100%",
+    height: "100%",
     borderRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
   },
-
   buttonText: {
-    color: "#fff",
+    color: "white",
     fontSize: 20,
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
     textShadowColor: "black",
     fontFamily: "LilitaOne",
-  },
-
-  title: {
-    marginTop: 10,
-    textAlign: "center",
-    fontSize: 100,
-    fontWeight: "900",
-    lineHeight: 100,
-    color: "yellow",
   },
   bird: {
     width: 70,

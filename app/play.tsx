@@ -1,64 +1,87 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ImageBackground, StyleSheet, Image, Pressable, }
-    from "react-native";
 import MovingBackground from "@/components/MovingBackground";
-import { useAudioPlayer} from "expo-audio";
-import { useEffect } from "react";
+import Pipe from "@/components/Pipe";
+import { DURATION } from "@/constants/animation";
+import { useAudioPlayer } from "expo-audio";
+import { useEffect, useState } from "react";
+import {
+  Image,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Play() {
-     const jumpSound = useAudioPlayer(
-     require("../assets/audios/wing.mp3"));
+  const jumpSound = useAudioPlayer(require("../assets/audios/wing.mp3"));
+  const pointSound = useAudioPlayer(require("../assets/audios/sfx_point.mp3"));
 
-    function handleJump() {
-        jumpSound.seekTo(0);
-        jumpSound.play();
-    }
-    useEffect(() => {
-      jumpSound.seekTo(0);
-      jumpSound.loop = true;
-      jumpSound.play();
+  const [obstacles, setObstacles] = useState<string[]>([]);
 
-      return () => {
-        jumpSound.pause();
-      }
+  function handleJump() {
+    jumpSound.seekTo(0);
+    jumpSound.play();
+  }
 
-    }, []);
+  function spawnObstacle() {
+    setObstacles((old) => [...old, Date.now().toString()]);
+  }
 
-    return (
-        <ImageBackground
-            source={require("../assets/images/background.png.avif")}
-            resizeMode="cover"
-            style={styles.background}
-        >
-            <Pressable onPress={handleJump} style={styles.background}>
-                <SafeAreaView style={styles.screen}>
-                    <Image
-                        source={require("../assets/images/brind.gif")}
-                        style={styles.bird}
-                    />
-                </SafeAreaView>
-            </Pressable>
+  function removeObstacle(id: string) {
+    setObstacles((old) => old.filter((item) => item !== id));
 
-            <MovingBackground />
-        </ImageBackground>
-    );
+    pointSound.seekTo(0);
+    pointSound.play();
+  }
+
+  useEffect(() => {
+    const interval = setInterval(spawnObstacle, DURATION / 4);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <ImageBackground
+      source={require("../assets/images/background.png.avif")}
+      resizeMode="cover"
+      style={styles.background}
+    >
+      <Pressable style={styles.background} onPress={handleJump}>
+        <SafeAreaView style={styles.screen}>
+          <Image
+            source={require("../assets/images/brind.gif")}
+            style={styles.bird}
+          />
+
+          {obstacles.map((obstacle) => (
+            <Pipe
+              key={obstacle}
+              gapY={195}
+              onEnd={() => removeObstacle(obstacle)}
+            />
+          ))}
+        </SafeAreaView>
+      </Pressable>
+
+      <MovingBackground />
+    </ImageBackground>
+  );
 }
 
 const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-    },
+  background: {
+    flex: 1,
+  },
 
-    screen: {
-        flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "center",
-    },
-    bird: {
-        width: 70,
-        height: 48,
-        position: "absolute",
-        top: "55%",
-        left: 100,
-    },
+  screen: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  bird: {
+    width: 70,
+    height: 48,
+    position: "absolute",
+    top: "50%",
+    left: 100,
+  },
 });
