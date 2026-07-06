@@ -1,13 +1,17 @@
 import { DURATION } from "@/constants/animation";
+import { BIRD_ASPECT_RATIO, BIRD_HEIGHT, BIRD_X } from "@/constants/bird";
 import { CAP_HEIGHT, GAP_SIZE, PIPE_WIDTH } from "@/constants/pipe";
+import { useGame } from "@/hooks/games"; // <-- Import que faltava
 import { useEffect } from "react";
-import { Dimensions, Easing, StyleSheet } from "react-native";
+import { Dimensions, Image, StyleSheet } from "react-native";
 import Animated, {
+  Easing,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  useAnimatedReaction,
 } from "react-native-reanimated";
-import { runOnJS } from "react-native-worklets";
 
 interface Props {
   gapY: number;
@@ -15,6 +19,8 @@ interface Props {
 }
 
 export default function Pipe({ gapY, onEnd }: Props) {
+  const { birdY, gameOver } = useGame();
+
   const { height, width } = Dimensions.get("window");
 
   const topHeight = gapY - GAP_SIZE / 2;
@@ -23,74 +29,103 @@ export default function Pipe({ gapY, onEnd }: Props) {
 
   const translateX = useSharedValue(0);
 
-  useEffect(() => {
-    translateX.value = withTiming(width, {
-      duration: DURATION,
-      easing: Easing.linear,
-    },
-    () => runOnJS(onEnd)(),
-  );
-  }, [translateX]);
-
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: -translateX.value,
-      },
-    ],
+    transform: [{ translateX: -translateX.value }],
   }));
 
+  useEffect(() => {
+    translateX.value = withTiming(
+      width,
+      {
+        duration: DURATION,
+        easing: Easing.linear,
+      },
+      () => {
+        if (translateX.value === width) {
+        runOnJS(onEnd)();
+        }
+      },
+    );
+  }, []);
+
+  useAnimatedReaction(
+    () => ({
+      birdY: birdY.value,
+      translateX: translateX.value,
+    }),
+    ({ birdY, translateX }) => {
+      "worklet";
+
+      const hitX = 
+        BIRD.x + BIRD.height * BIRD.aspectRatio - BIRD.hitbox.right >
+         width - translateX && BIRD.x + BIRD.hitbox.left< width - translateX + PIPE_WIDTH;
+
+      const hitTop = birdY < gapY - GAP_SIZE / 2;
+      const hitBottom = birdY + BIRD_HEIGHT > gapY + GAP_SIZE / 2;
+      
+      if (hitX && (hitTop || hitBottom)) {
+        runOnJS(gameOver)();
+      }
+    }
+  );
+7
   return (
     <>
-      {/* Cano Superior */}
       <Animated.View
         style={[
           styles.pipe,
-          {
-            left: width,
-            top: 0,
-            height: topHeight,
-          },
+          { left: width, top: 0, height: topHeight },
           animatedStyle,
         ]}
-      />
+      >
+        <Image
+          source={require("@/assets/images/pipe.png")}
+          style={[styles.image, { transform: [{ rotate: "180deg" }] }]}
+          resizeMode="stretch"
+        />
+      </Animated.View>
 
-      {/* Tampa Superior */}
       <Animated.View
         style={[
           styles.cap,
-          {
-            left: width - 5,
-            top: topHeight - CAP_HEIGHT,
-          },
+          { left: width - 5, top: topHeight - CAP_HEIGHT },
           animatedStyle,
         ]}
-      />
+      >
+        <Image
+          source={require("@/assets/images/cap.png")}
+          style={[styles.image, { transform: [{ rotate: "180deg" }] }]}
+          resizeMode="stretch"
+        />
+      </Animated.View>
 
-      {/* Cano Inferior */}
       <Animated.View
         style={[
           styles.pipe,
-          {
-            left: width,
-            top: bottomY,
-            height: bottomHeight,
-          },
+          { left: width, top: bottomY, height: bottomHeight },
           animatedStyle,
         ]}
-      />
+      >
+        <Image
+          source={require("@/assets/images/pipe.png")}
+          style={styles.image}
+          resizeMode="stretch"
+        />
+      </Animated.View>
 
-      {/* Tampa Inferior */}
       <Animated.View
         style={[
           styles.cap,
-          {
-            left: width - 5,
-            top: bottomY,
-          },
+          { left: width - 5, top: bottomY },
           animatedStyle,
         ]}
-      />
+      >
+        <Image
+          source={require("@/assets/images/cap.png")}
+          style={styles.image}
+          resizeMode="stretch"
+        />
+      </Animated.View>
     </>
   );
 }
@@ -99,18 +134,14 @@ const styles = StyleSheet.create({
   pipe: {
     position: "absolute",
     width: PIPE_WIDTH,
-    backgroundColor: "#2ecc71",
-    borderLeftWidth: 4,
-    borderRightWidth: 4,
-    borderColor: "#1b5e20",
   },
-
   cap: {
     position: "absolute",
     width: PIPE_WIDTH + 10,
     height: CAP_HEIGHT,
-    backgroundColor: "#2ecc71",
-    borderWidth: 4,
-    borderColor: "#1b5e20", 
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
 });

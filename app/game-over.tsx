@@ -12,16 +12,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Home() {
+export default function GameOver() {
   return (
     <ImageBackground
-      source={require("../assets/images/background.png")}
+      source={require("@/assets/images/background.png")}
       resizeMode="cover"
       style={styles.background}
     >
-      <BackgroundSound
-  source={require("../assets/audios/background.mp3.mp3")}
-/>
+      <BackgroundSound source={require("@/assets/audios/background.mp3.mp3")} />
       <SafeAreaView style={styles.screen}>
         <GradientText
           colors={["#FF8A00", "#FFD600"]}
@@ -29,22 +27,22 @@ export default function Home() {
           start={[0, 0]}
           end={[1, 1]}
         >
-          Flappy Bird
+          Game Over
         </GradientText>
 
-        <Link href="/play" asChild>
+        <Link href="/" asChild replace>
           <TouchableOpacity style={styles.button}>
             <LinearGradient
               colors={["#FF8A00", "#FFD600"]}
               style={styles.buttonGradient}
             >
-              <Text style={styles.buttonText}>Jogar</Text>
+              <Text style={styles.buttonText}>Voltar ao menu</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Link>
 
         <Image
-          source={require("../assets/images/bird.gif")}
+          source={require("@/assets/images/bird.gif")}
           style={styles.bird}
         />
       </SafeAreaView>
@@ -72,7 +70,7 @@ const styles = StyleSheet.create({
       width: 3,
       height: 3,
     },
-    textShadowRadius: 0,
+    textShadowRadius: 1,
     paddingRight: 3,
   },
   button: {
@@ -101,8 +99,8 @@ const styles = StyleSheet.create({
     fontFamily: "LilitaOne",
   },
   bird: {
-    width: 56,
-    height: 36,
+    width: 70,
+    height: 48,
     position: "absolute",
     top: "35%",
     left: "35%",

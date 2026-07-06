@@ -7,6 +7,7 @@ import "react-native-reanimated";
 
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { LuckiestGuy_400Regular } from "@expo-google-fonts/luckiest-guy";
+import { GameProvider } from "@/hooks/games";
 
 export { ErrorBoundary };
 
@@ -46,9 +47,11 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
+    <GameProvider>
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="play" />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="play" options={{ headerShown: false }}/>
     </Stack>
+    </GameProvider>
   );
 }
