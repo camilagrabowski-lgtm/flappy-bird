@@ -1,11 +1,7 @@
 import GameOver from "@/app/game-over";
-import {
-  BIRD_ASPECT_RATIO,
-  BIRD_HEIGHT,
-  BIRD_X,
-} from "@/constants/bird";
-import { GROUND_HEIGHT } from "@/constants/ground";
 import { GRAVITY } from "@/constants/animation";
+import { BIRD } from "@/constants/bird";
+import { GROUND_HEIGHT } from "@/constants/ground";
 import { useGame } from "@/hooks/games";
 import { useEffect } from "react";
 import { Dimensions, StyleSheet } from "react-native";
@@ -13,11 +9,13 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useFrameCallback,
+  useSharedValue,
 } from "react-native-reanimated";
 
 export default function Bird() {
   const { height } = Dimensions.get("window");
   const { birdY, velocity } = useGame();
+  const disabled = useSharedValue(false);
 
   const frame = useFrameCallback((frameInfo) => {
     "worklet";
@@ -27,8 +25,12 @@ export default function Bird() {
     velocity.value += GRAVITY * t;
     birdY.value += velocity.value * t;
 
-    if (birdY.value > height - BIRD.height + BIRD.hitbox.bottom - GROUND_HEIGHT) {
-      runOnJS(GameOver)();
+    if (
+      birdY.value >
+      height - BIRD.height + BIRD.hitBox.bottom - GROUND_HEIGHT
+    ) {
+      disabled.value = true;
+      runOnJS(GameOver)(); 
     }
 
     if (birdY.value < 0) {
@@ -62,10 +64,10 @@ export default function Bird() {
 
 const styles = StyleSheet.create({
   bird: {
-    width: BIRD_HEIGHT * BIRD_ASPECT_RATIO,
-    height: BIRD_HEIGHT,
+    width: BIRD.height * BIRD.aspectRatio,
+    height: BIRD.height,
     position: "absolute",
     top: 0,
-    left: BIRD_X,
+    left: BIRD.x,
   },
 });

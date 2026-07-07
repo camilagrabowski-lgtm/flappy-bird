@@ -2,6 +2,7 @@ import Bird from "@/components/Bird";
 import MovingBackground from "@/components/MovingBackground";
 import Pipe from "@/components/Pipe";
 import { DURATION, JUMP } from "@/constants/animation";
+import { BIRD } from "@/constants/bird";
 import { GROUND_HEIGHT } from "@/constants/ground";
 import { CAP_HEIGHT, GAP_SIZE } from "@/constants/pipe";
 import { useGame } from "@/hooks/games";
@@ -16,6 +17,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Obstacle {
@@ -23,14 +25,19 @@ interface Obstacle {
   gapY: number;
 }
 
+const { height } = Dimensions.get("window");
+
 export default function Play() {
-  const { height } = Dimensions.get("window");
   const { velocity, score, setScore } = useGame();
   const [obstacles, setObstacles] = useState([] as Obstacle[]);
+  const [started, setStarted] = useState(false);
+
   const jumpSound = useAudioPlayer(require("@/assets/audios/wing.mp3"));
   const pointSound = useAudioPlayer(require("@/assets/audios/sfx_point.mp3"));
 
   function handleJump() {
+    if (!started) setStarted (true);
+
     velocity.value = JUMP;
     try {
       jumpSound.seekTo(0);
@@ -62,10 +69,12 @@ export default function Play() {
   }
 
   useEffect(() => {
+    if(started) {
     const interval = setInterval(() => spawnObstacle(), DURATION / 3);
 
     return () => clearInterval(interval);
-  }, []);
+    }
+  }, [started]);
 
   return (
     <ImageBackground
@@ -75,7 +84,11 @@ export default function Play() {
     >
       <Pressable onPress={handleJump} style={styles.background}>
         <SafeAreaView style={styles.screen}>
-          <Bird />
+          {started ? (
+            <Bird />
+          ) : (
+            <Image source={require("@/assets/images/bird.gif")} style={styles.bird} />
+          )}
 
           {obstacles.map((obstacle) => (
             <Pipe
@@ -134,4 +147,11 @@ const styles = StyleSheet.create({
     textShadowRadius: 1,
     color: "white",
   },
+  bird: {
+    width: BIRD.height * BIRD.aspectRatio,
+    height: BIRD.height,
+    position: "absolute",
+    left: BIRD.x,
+    top: height / 2
+  }
 });
