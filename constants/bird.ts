@@ -1,12 +1,12 @@
 export const BIRD = {
-    height: 36,
-    aspectRatio: 350 / 240,
-    x: 100,
+  height: 80,
+  aspectRatio: 500 / 500, // ou a proporção correta da imagem
+  x: 100,
 
-    hitBox: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-    }
-}
+  hitbox: {
+    top: 10,
+    bottom: 10,
+    left: 10,
+    right: 10,
+  },
+};

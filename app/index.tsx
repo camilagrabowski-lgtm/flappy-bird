@@ -38,7 +38,7 @@ export default function Home() {
               colors={["#FF8A00", "#FFD600"]}
               style={styles.buttonGradient}
             >
-              <Text style={styles.buttonText}>Jogar</Text>
+              <Text style={styles.buttonText}>Play</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Link>
@@ -86,23 +86,23 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 65,
+    paddingVertical: 30,
     width: "100%",
     height: "100%",
     borderRadius: 100,
   },
   buttonText: {
-    color: "white",
-    fontSize: 20,
+    color: "green",
+    fontSize: 50,
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    textShadowRadius: 10,
     textShadowColor: "black",
     fontFamily: "LilitaOne",
   },
   bird: {
-    width: 56,
-    height: 36,
+    width: 120,
+    height: 150,
     position: "absolute",
     top: "35%",
     left: "35%",

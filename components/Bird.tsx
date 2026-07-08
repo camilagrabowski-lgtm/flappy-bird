@@ -27,7 +27,7 @@ export default function Bird() {
 
     if (
       birdY.value >
-      height - BIRD.height + BIRD.hitBox.bottom - GROUND_HEIGHT
+      height - BIRD.height + BIRD.hitbox.bottom - GROUND_HEIGHT
     ) {
       disabled.value = true;
       runOnJS(GameOver)(); 
@@ -64,10 +64,9 @@ export default function Bird() {
 
 const styles = StyleSheet.create({
   bird: {
-    width: BIRD.height * BIRD.aspectRatio,
-    height: BIRD.height,
     position: "absolute",
-    top: 0,
+    width: 67,
+    height: 56,
     left: BIRD.x,
   },
 });

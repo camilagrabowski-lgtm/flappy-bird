@@ -55,9 +55,9 @@ export default function Pipe({ gapY, onEnd }: Props) {
       if (disabled.value) return;
 
       const hitX =
-        BIRD.x + BIRD.height * BIRD.aspectRatio - BIRD.hitBox.right >
+        BIRD.x + BIRD.height * BIRD.aspectRatio - BIRD.hitbox.right >
           width - translateX &&
-        BIRD.x + BIRD.hitBox.left < width - translateX + PIPE_WIDTH;
+        BIRD.x + BIRD.hitbox.left < width - translateX + PIPE_WIDTH;
 
       const hitTop = birdY < gapY - GAP_SIZE / 2;
       const hitBottom = birdY + BIRD.height > gapY + GAP_SIZE / 2;
