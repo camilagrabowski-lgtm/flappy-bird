@@ -1,4 +1,3 @@
-import GameOver from "@/app/game-over";
 import { GRAVITY } from "@/constants/animation";
 import { BIRD } from "@/constants/bird";
 import { GROUND_HEIGHT } from "@/constants/ground";
@@ -14,7 +13,7 @@ import Animated, {
 
 export default function Bird() {
   const { height } = Dimensions.get("window");
-  const { birdY, velocity } = useGame();
+  const { birdY, velocity, gameOver } = useGame();
   const disabled = useSharedValue(false);
 
   const frame = useFrameCallback((frameInfo) => {
@@ -30,7 +29,7 @@ export default function Bird() {
       height - BIRD.height + BIRD.hitbox.bottom - GROUND_HEIGHT
     ) {
       disabled.value = true;
-      runOnJS(GameOver)(); 
+      runOnJS(gameOver)(); 
     }
 
     if (birdY.value < 0) {

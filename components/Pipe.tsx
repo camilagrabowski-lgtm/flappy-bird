@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   pipe: {
     position: "absolute",
     width: PIPE_WIDTH,
+    height: CAP_HEIGHT,
 },
   cap: {
     position: "absolute",

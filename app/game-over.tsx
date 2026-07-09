@@ -1,9 +1,9 @@
 import BackgroundSound from "@/components/BackgroundSound";
 import GradientText from "@/components/GradientText";
-import MovingBackground from "@/components/MovingBackground";
-import { LinearGradient } from "expo-linear-gradient";
+import { useGame } from "@/hooks/games";
 import { Link } from "expo-router";
 import {
+  View,
   Image,
   ImageBackground,
   StyleSheet,
@@ -13,13 +13,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GameOver() {
+  const { score } = useGame();
   return (
     <ImageBackground
       source={require("@/assets/images/background.png")}
       resizeMode="cover"
       style={styles.background}
     >
-      <BackgroundSound source={require("@/assets/audios/background.mp3.mp3")} />
+      <BackgroundSound
+        source={require("@/assets/audios/background.mp3.mp3")}
+      />
+
       <SafeAreaView style={styles.screen}>
         <GradientText
           colors={["#FF8A00", "#FFD600"]}
@@ -30,80 +34,97 @@ export default function GameOver() {
           Game Over
         </GradientText>
 
-        <Link href="/" asChild replace>
-          <TouchableOpacity style={styles.button}>
-            <LinearGradient
-              colors={["#FF8A00", "#FFD600"]}
-              style={styles.buttonGradient}
-            >
-              <Text style={styles.buttonText}>Voltar ao menu</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Link>
+        <View style={styles.score}>
+
+          <Text style={styles.scoreText}>{score}</Text>
+
+          <Image source={require("@/assets/images/coin.gif")}
+            style={styles.scoreImage} />
+        </View>
 
         <Image
           source={require("@/assets/images/bird.gif")}
           style={styles.bird}
         />
+
+        <Link href="/" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Voltar ao Menu</Text>
+          </TouchableOpacity>
+        </Link>
       </SafeAreaView>
-      <MovingBackground />
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   background: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
   },
+
   screen: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
     alignItems: "center",
   },
+
   title: {
-    fontSize: 50,
     marginTop: 30,
+    fontSize: 55,
     fontFamily: "LuckiestGuy",
-    textShadowColor: "rgba(0, 0, 0, 0.5)",
+    textShadowColor: "rgba(128, 110, 110, 0.5)",
     textShadowOffset: {
       width: 3,
       height: 3,
     },
     textShadowRadius: 1,
-    paddingRight: 3,
   },
+
   button: {
-    borderRadius: 100,
     position: "absolute",
-    top: "50%",
-    shadowColor: "black",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
-    elevation: 3,
+    top: "45%",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  buttonGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    width: "100%",
-    height: "100%",
-    borderRadius: 100,
-  },
+
   buttonText: {
-    color: "white",
-    fontSize: 20,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-    textShadowColor: "black",
-    fontFamily: "LilitaOne",
+    color: "#000000",
+    fontSize: 55,
+    fontFamily: "LuckiestGuy",
+    textShadowColor: "#8d8383",
+    textShadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    textShadowRadius: 5,
   },
+
   bird: {
-    width: 70,
-    height: 48,
+    width: 120,
+    height: 150,
     position: "absolute",
-    top: "35%",
-    left: "35%",
+    top: "34%",
+    left: "32%",
     transform: [{ rotate: "-20deg" }],
+  },
+  score: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 20,
+  },
+  scoreImage: {
+    height: 30,
+    width: 30,
+  },
+  scoreText: {
+    fontSize: 40,
+    fontFamily: "luckiestGuy",
+    textShadowColor: "black",
+    textShadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    textShadowRadius: 1,
+    color: "white",
   },
 });

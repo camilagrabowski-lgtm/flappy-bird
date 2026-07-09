@@ -152,6 +152,6 @@ const styles = StyleSheet.create({
     height: BIRD.height,
     position: "absolute",
     left: BIRD.x,
-    top: height / 2
+    top: height / 2,
   }
 });
