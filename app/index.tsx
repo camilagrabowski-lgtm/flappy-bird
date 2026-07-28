@@ -1,7 +1,9 @@
 import BackgroundSound from "@/components/BackgroundSound";
 import GradientText from "@/components/GradientText";
+import { useGame } from "@/hooks/games";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
+import { router } from "expo-router";
 import {
   View,
   Image,
@@ -13,6 +15,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
+  const { reset, highscore} = useGame();
+
   return (
     <ImageBackground
   source={require("../assets/images/background.png.1.jpg")}
@@ -24,9 +28,15 @@ export default function Home() {
   />
 
   <SafeAreaView style={styles.menu}>
-    <View style={styles.menu}>
+  <View style={styles.header}>
+    <Image
+      source={require("../assets/images/bird.gif")}
+      style={styles.bmo}
+    />
+
+    <View>
       <GradientText
-        colors={["#FF8A00", "#FFD600"]}
+        colors={["#fcfbf9", "#f8f8f6"]}
         style={styles.title}
         start={[0, 0]}
         end={[1, 1]}
@@ -34,18 +44,22 @@ export default function Home() {
         FLYING BMO
       </GradientText>
 
-      <Link href="/play" asChild>
-        <TouchableOpacity>
-          <Text style={styles.buttonText}>Play</Text>
-        </TouchableOpacity>
-      </Link>
+      <Text style={styles.highscore}>
+        Melhor pontuação: {highscore}
+      </Text>
     </View>
+  </View>
 
-    <Image
-      source={require("../assets/images/bird.gif")}
-      style={styles.bird}
-    />
-  </SafeAreaView>
+  <View style={styles.buttons}>
+    <TouchableOpacity onPress={() => router.push("/play")}>
+      <Text style={styles.buttonsText}>PLAY</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity onPress={() => router.push("/skins")}>
+      <Text style={styles.buttonsText}>PERSONAGENS</Text>
+    </TouchableOpacity>
+  </View>
+</SafeAreaView>
 </ImageBackground>
   );
 }
@@ -55,56 +69,70 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
- menu: {
-  position: "absolute",
-  top: "25%",
-  left: 0,
-  right: 0,
+menu: {
+  flex: 1,
   alignItems: "center",
   justifyContent: "center",
 },
 
+
 title: {
-  fontSize: 55,
+  fontSize: 75,
   fontFamily: "LuckiestGuy",
-  marginBottom: 55, // distância entre o título e o Play
-  marginTop: 35,
-  textShadowColor: "rgba(0,0,0,0.5)",
+  color: "white",
+  textShadowColor: "rgba(10, 10, 10, 0.5)",
   textShadowOffset: {
     width: 3,
     height: 3,
   },
   textShadowRadius: 1,
+  paddingRight: 3,
 },
 
-buttonText: {
-  color: "#000",
-  fontSize: 70,
+buttonsText: {
+  color: "#fdfbfb",
+  fontSize: 50,
   fontFamily: "LilitaOne",
-  textShadowColor: "rgba(0,0,0,0.5)",
+  textShadowColor: "rgba(8, 8, 8, 0.5)",
   textShadowOffset: {
     width: 3,
     height: 3,
   },
   textShadowRadius: 5,
 },
-  buttonGradient: {
+  buttonsGradient: {
+    color: "white",
     paddingHorizontal: 65,
     paddingVertical: 30,
     width: "100%",
     height: "100%",
     borderRadius: 100,
+    
   },
-  button: {
-  justifyContent: "center",
+ buttons: {
+  marginTop: 90, // distância entre o título e os botões
   alignItems: "center",
+  justifyContent: "center",
+  borderColor: "white"
 },
-  bird: {
-    width: 120,
-    height: 150,
-    position: "absolute",
-    top: "35%",
-    left: "35%",
-    transform: [{ rotate: "-20deg" }],
-  },
+
+  highscore: {
+  color: "white",
+  fontSize: 25,
+  textAlign: "center",
+  marginTop: 50,
+},
+  header: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  marginTop: -80, // sobe um pouco o título
+},
+
+
+bmo: {
+  width: 140,
+  height: 140,
+  marginRight: 20,
+},
 });
