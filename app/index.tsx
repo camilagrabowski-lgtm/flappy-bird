@@ -120,7 +120,7 @@ buttonsText: {
   color: "white",
   fontSize: 25,
   textAlign: "center",
-  marginTop: 50,
+  marginTop: 20,
 },
   header: {
   flexDirection: "row",

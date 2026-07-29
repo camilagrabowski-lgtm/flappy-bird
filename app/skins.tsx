@@ -1,5 +1,8 @@
+import { useState } from "react";
 import {
+  Alert,
   Image,
+  ImageBackground,
   Pressable,
   StyleSheet,
   Text,
@@ -7,7 +10,6 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 
 const skins = [
@@ -16,44 +18,75 @@ const skins = [
     nome: "Finn",
     preco: 0,
     imagem: require("@/assets/images/finn.png"),
+    size: 200,
   },
   {
     id: 2,
     nome: "Jake",
     preco: 50,
     imagem: require("@/assets/images/jake.png"),
+    size: 150,
   },
   {
     id: 3,
     nome: "BMO",
     preco: 100,
     imagem: require("@/assets/images/bird.gif"),
+    size: 120,
   },
   {
     id: 4,
     nome: "Marceline",
     preco: 150,
     imagem: require("@/assets/images/marceline.png"),
+    size: 200,
   },
   {
     id: 5,
     nome: "Princesa Jujuba",
     preco: 200,
     imagem: require("@/assets/images/princesa-jujuba.png"),
+    size: 100,
   },
 ];
 
 export default function Personagens() {
+  const [moedas, setMoedas] = useState(0);
+
+  const selecionarSkin = (skin: (typeof skins)[0]) => {
+    if (skin.preco === 0) {
+      Alert.alert("Skin selecionada!", `${skin.nome} equipada.`);
+      return;
+    }
+
+    if (moedas < skin.preco) {
+      Alert.alert(
+        "Moedas insuficientes",
+        "Você não possui moedas suficientes para comprar esta skin."
+      );
+      return;
+    }
+
+    setMoedas((valor) => valor - skin.preco);
+
+    Alert.alert(
+      "Compra realizada!",
+      `Você comprou a skin ${skin.nome}.`
+    );
+  };
+
   return (
-    <LinearGradient
-      colors={["#459107", "#dde032", "#429b49"]}
-      style={{ flex: 1 }}
-    >
+  <ImageBackground
+    source={require("../assets/images/fundo.png")}
+    style={{ flex: 1 }}
+    resizeMode="cover"
+  >
+    <View style={styles.overlay}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>🎮 Escolha sua Skin</Text>
+        <Text style={styles.title}>🎮 Compre sua Skin</Text>
 
         <View style={styles.coinsBox}>
-          <Text style={styles.coins}>🪙 2.350 moedas</Text>
+          <Text style={styles.coins}>🪙 {moedas} moedas</Text>
         </View>
 
         <ScrollView
@@ -61,27 +94,48 @@ export default function Personagens() {
           showsVerticalScrollIndicator={false}
         >
           {skins.map((skin) => (
-            <Pressable
-              key={skin.id}
-              style={styles.card}
-              onPress={() => console.log(skin.nome)}
-            >
-              <Image source={skin.imagem} style={styles.image} />
+  <View
+    key={skin.id}
+    style={styles.card}
+  >
+  <View style={styles.imageContainer}>
+ <Image
+  source={skin.imagem}
+  style={[
+    styles.image,
+    {
+      width: skin.size,
+      height: skin.size,
+    },
+    skin.preco > 0 && styles.lockedImage,
+  ]}
+/>
 
-<View style={styles.info}>
-  <Text style={styles.name}>{skin.nome}</Text>
-
-  <View style={styles.priceBox}>
-    <Text style={styles.price}>
-      {skin.preco === 0 ? "GRÁTIS" : `🪙 ${skin.preco}`}
-    </Text>
-  </View>
+  {skin.preco > 0 && (
+    <View style={styles.lock}>
+      <Text style={styles.lockText}>🔒</Text>
+    </View>
+  )}
 </View>
 
-<Pressable style={styles.selectButton}>
+  <View style={styles.info}>
+    <Text style={styles.name}>{skin.nome}</Text>
+
+    <View style={styles.priceBox}>
+      <Text style={styles.price}>
+        {skin.preco === 0 ? "GRÁTIS" : `🪙 ${skin.preco}`}
+      </Text>
+    </View>
+  </View>
+
+ <Pressable
+  style={styles.selectButton}
+  onPress={() => selecionarSkin(skin)}
+>
   <Text style={styles.selectText}>Selecionar</Text>
 </Pressable>
-            </Pressable>
+</View>
+
           ))}
         </ScrollView>
 
@@ -91,9 +145,10 @@ export default function Personagens() {
         >
           <Text style={styles.buttonText}>← Voltar</Text>
         </Pressable>
-      </SafeAreaView>
-    </LinearGradient>
-  );
+            </SafeAreaView>
+    </View>
+  </ImageBackground>
+);
 }
 
 const styles = StyleSheet.create({
@@ -106,7 +161,10 @@ const styles = StyleSheet.create({
   alignItems: "center",
   justifyContent: "center",
 },
-
+overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0,0,0,0.20)",
+},
 
   title: {
     fontSize: 34,
@@ -128,6 +186,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  lockedImage: {
+  opacity: 0.35,
+},
+lock: {
+  position: "absolute",
+  width: 45,
+  height: 45,
+  borderRadius: 22.5,
+  backgroundColor: "rgba(255, 255, 255, 0.3)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+lockText: {
+  fontSize: 24,
+},
+
   coins: {
     fontSize: 18,
     fontWeight: "bold",
@@ -144,7 +219,7 @@ const styles = StyleSheet.create({
   card: {
   width: 170,
   height: 320, // altura fixa
-  backgroundColor: "rgba(255,255,255,0.25)", // transparente
+  backgroundColor: "rgba(255,255,255,0.85)",
   borderWidth: 3,
   borderColor: "#000",
   borderRadius: 22,
@@ -163,12 +238,18 @@ const styles = StyleSheet.create({
   elevation: 8,
 },
 
+imageContainer: {
+  width: 120,
+  height: 120,
+  justifyContent: "center",
+  alignItems: "center",
+  position: "relative",
+  marginBottom: 5,
+},
 
-  image: {
-    width: 110,
-    height: 110,
-    resizeMode: "contain",
-  },
+image: {
+  resizeMode: "contain",
+},
 
   name: {
   fontSize: 20,
