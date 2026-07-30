@@ -1,71 +1,47 @@
-import { GRAVITY } from "@/constants/animation";
+import { StyleSheet } from "react-native";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+
+import { skins } from "@/constants/skin";
 import { BIRD } from "@/constants/bird";
-import { GROUND_HEIGHT } from "@/constants/ground";
 import { useGame } from "@/hooks/games";
-import { useEffect } from "react";
-import { Dimensions, StyleSheet } from "react-native";
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useFrameCallback,
-  useSharedValue,
-} from "react-native-reanimated";
 
 export default function Bird() {
-  const { height } = Dimensions.get("window");
-  const { birdY, velocity, gameOver } = useGame();
-  const disabled = useSharedValue(false);
+  const { birdY, skinSelecionada } = useGame();
 
-  const frame = useFrameCallback((frameInfo) => {
-    "worklet";
+  // Procura a skin selecionada
+  const skin =
+    skins.find((item) => item.id === Number(skinSelecionada)) ||
+    skins[0];
 
-    const t = (frameInfo.timeSincePreviousFrame ?? 0) / 1000;
-
-    velocity.value += GRAVITY * t;
-    birdY.value += velocity.value * t;
-
-    if (
-      birdY.value >
-      height - BIRD.height + BIRD.hitbox.bottom - GROUND_HEIGHT
-    ) {
-      disabled.value = true;
-      runOnJS(gameOver)(); 
-    }
-
-    if (birdY.value < 0) {
-      birdY.value = 0;
-      velocity.value = 0;
-    }
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: birdY.value,
+        },
+      ],
+    };
   });
-
-  useEffect(() => {
-    frame.setActive(true);
-
-    return () => frame.setActive(false);
-  }, [frame]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: birdY.value },
-      {
-        rotate: `${(velocity.value / 1000) * 90}deg`,
-      },
-    ],
-  }));
 
   return (
     <Animated.Image
-      source={require("@/assets/images/bird.gif")}
-      style={[styles.bird, animatedStyle]}
+      source={skin.imagem}
+      resizeMode="contain"
+      style={[
+        styles.image,
+        animatedStyle,
+        {
+          width: skin.size,
+          height: skin.size,
+        },
+      ]}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  bird: {
+  image: {
     position: "absolute",
-    width: 67,
-    height: 56,
     left: BIRD.x,
   },
 });

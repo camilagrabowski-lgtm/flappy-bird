@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Alert,
   Image,
@@ -11,55 +11,56 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-
-const skins = [
-  {
-    id: 1,
-    nome: "Finn",
-    preco: 0,
-    imagem: require("@/assets/images/finn.png"),
-    size: 200,
-  },
-  {
-    id: 2,
-    nome: "Jake",
-    preco: 50,
-    imagem: require("@/assets/images/jake.png"),
-    size: 150,
-  },
-  {
-    id: 3,
-    nome: "BMO",
-    preco: 100,
-    imagem: require("@/assets/images/bird.gif"),
-    size: 120,
-  },
-  {
-    id: 4,
-    nome: "Marceline",
-    preco: 150,
-    imagem: require("@/assets/images/marceline.png"),
-    size: 200,
-  },
-  {
-    id: 5,
-    nome: "Princesa Jujuba",
-    preco: 200,
-    imagem: require("@/assets/images/princesa-jujuba.png"),
-    size: 100,
-  },
-];
+import { useGame } from "@/hooks/games";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { skins } from "@/constants/skin";
 
 export default function Personagens() {
-  const [moedas, setMoedas] = useState(0);
+  const {
+    coins,
+    spendCoins,
+    skinSelecionada,
+    setSkinSelecionada,
+  } = useGame();
 
-  const selecionarSkin = (skin: (typeof skins)[0]) => {
-    if (skin.preco === 0) {
-      Alert.alert("Skin selecionada!", `${skin.nome} equipada.`);
-      return;
+  const [skinsCompradas, setSkinsCompradas] = useState<number[]>([1]);
+
+useEffect(() => {
+  async function carregar() {
+    const skinsSalvas = await AsyncStorage.getItem("skinsCompradas");
+    const skinAtual = await AsyncStorage.getItem("skinSelecionada");
+
+    if (skinsSalvas) {
+      setSkinsCompradas(JSON.parse(skinsSalvas));
+    } else {
+      const inicial = [1]; // BMO começa liberado
+      setSkinsCompradas(inicial);
+
+      await AsyncStorage.setItem(
+        "skinsCompradas",
+        JSON.stringify(inicial)
+      );
     }
 
-    if (moedas < skin.preco) {
+    if (skinAtual) {
+      setSkinSelecionada(Number(skinAtual));
+    } else {
+      setSkinSelecionada(1);
+
+      await AsyncStorage.setItem(
+        "skinSelecionada",
+        "1"
+      );
+    }
+  }
+
+  carregar();
+}, []);
+
+const selecionarSkin = async (skin: (typeof skins)[number]) => {
+  // Ainda não comprou
+  if (!skinsCompradas.includes(skin.id)) {
+    if (coins < skin.preco) {
       Alert.alert(
         "Moedas insuficientes",
         "Você não possui moedas suficientes para comprar esta skin."
@@ -67,13 +68,45 @@ export default function Personagens() {
       return;
     }
 
-    setMoedas((valor) => valor - skin.preco);
+    await spendCoins(skin.preco);
+
+    const novasSkins = [...skinsCompradas, skin.id];
+
+    setSkinsCompradas(novasSkins);
+
+    await AsyncStorage.setItem(
+      "skinsCompradas",
+      JSON.stringify(novasSkins)
+    );
+
+    setSkinSelecionada(skin.id);
+
+    await AsyncStorage.setItem(
+      "skinSelecionada",
+      skin.id.toString()
+    );
 
     Alert.alert(
       "Compra realizada!",
-      `Você comprou a skin ${skin.nome}.`
+      `${skin.nome} foi comprada e equipada.`
     );
-  };
+
+    return;
+  }
+
+  // Apenas equipa
+  setSkinSelecionada(skin.id);
+
+  await AsyncStorage.setItem(
+    "skinSelecionada",
+    skin.id.toString()
+  );
+
+  Alert.alert(
+    "Skin equipada!",
+    `${skin.nome} equipada.`
+  );
+};
 
   return (
   <ImageBackground
@@ -86,7 +119,7 @@ export default function Personagens() {
         <Text style={styles.title}>🎮 Compre sua Skin</Text>
 
         <View style={styles.coinsBox}>
-          <Text style={styles.coins}>🪙 {moedas} moedas</Text>
+          <Text style={styles.coins}>🪙 {coins} moedas</Text>
         </View>
 
         <ScrollView
@@ -102,20 +135,20 @@ export default function Personagens() {
  <Image
   source={skin.imagem}
   style={[
-    styles.image,
-    {
-      width: skin.size,
-      height: skin.size,
-    },
-    skin.preco > 0 && styles.lockedImage,
-  ]}
+  styles.image,
+  {
+    width: skin.size,
+    height: skin.size,
+  },
+  !skinsCompradas.includes(skin.id) && styles.lockedImage,
+]}
 />
 
-  {skin.preco > 0 && (
-    <View style={styles.lock}>
-      <Text style={styles.lockText}>🔒</Text>
-    </View>
-  )}
+ {!skinsCompradas.includes(skin.id) && (
+  <View style={styles.lock}>
+    <Text style={styles.lockText}>🔒</Text>
+  </View>
+)}
 </View>
 
   <View style={styles.info}>
@@ -123,8 +156,10 @@ export default function Personagens() {
 
     <View style={styles.priceBox}>
       <Text style={styles.price}>
-        {skin.preco === 0 ? "GRÁTIS" : `🪙 ${skin.preco}`}
-      </Text>
+  {skinsCompradas.includes(skin.id)
+    ? "GRÁTIS"
+    : `🪙 ${skin.preco}`}
+</Text>
     </View>
   </View>
 
@@ -132,7 +167,13 @@ export default function Personagens() {
   style={styles.selectButton}
   onPress={() => selecionarSkin(skin)}
 >
-  <Text style={styles.selectText}>Selecionar</Text>
+ <Text style={styles.selectText}>
+  {skinSelecionada === skin.id
+    ? "Selecionado"
+    : skinsCompradas.includes(skin.id)
+    ? "Selecionar"
+    : "Comprar"}
+</Text>
 </Pressable>
 </View>
 
@@ -179,7 +220,7 @@ overlay: {
 
   coinsBox: {
     alignSelf: "center",
-    backgroundColor: "#FFD54F",
+    backgroundColor: "#ffffff6e",
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 30,

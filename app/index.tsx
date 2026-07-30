@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const { reset, highscore} = useGame();
+  const { coins } = useGame();
 
   return (
     <ImageBackground
@@ -34,32 +35,41 @@ export default function Home() {
       style={styles.bmo}
     />
 
-    <View>
-      <GradientText
-        colors={["#fcfbf9", "#f8f8f6"]}
-        style={styles.title}
-        start={[0, 0]}
-        end={[1, 1]}
-      >
-        FLYING BMO
-      </GradientText>
+    <GradientText
+      colors={["#fcfbf9", "#f8f8f6"]}
+      style={styles.title}
+      start={[0, 0]}
+      end={[1, 1]}
+    >
+      FLYING BMO
+    </GradientText>
 
-      <Text style={styles.highscore}>
-        Melhor pontuação: {highscore}
-      </Text>
-    </View>
+    <Text style={styles.highscore}>
+      Melhor pontuação: {highscore}
+    </Text>
   </View>
 
-  <View style={styles.buttons}>
-    <TouchableOpacity onPress={() => router.push("/play")}>
-      <Text style={styles.buttonsText}>PLAY</Text>
-    </TouchableOpacity>
+  <View style={styles.buttonsContainer}>
+  <TouchableOpacity
+    style={styles.menuButton}
+    onPress={() => {
+      reset();
+      router.push("/play");
+    }}
+  >
+    <Text style={styles.menuButtonText}>▶ PLAY</Text>
+  </TouchableOpacity>
 
-    <TouchableOpacity onPress={() => router.push("/skins")}>
-      <Text style={styles.buttonsText}>PERSONAGENS</Text>
-    </TouchableOpacity>
-  </View>
+  <TouchableOpacity
+    style={styles.menuButton}
+    onPress={() => router.push("/skins")}
+  >
+    <Text style={styles.menuButtonText}>🎮 PERSONAGENS</Text>
+  </TouchableOpacity>
+</View>
+
 </SafeAreaView>
+
 </ImageBackground>
   );
 }
@@ -74,65 +84,110 @@ menu: {
   alignItems: "center",
   justifyContent: "center",
 },
-
+buttonsContainer: {
+  marginTop: 80,
+  alignItems: "center",
+},
 
 title: {
-  fontSize: 75,
+  fontSize: 78,
   fontFamily: "LuckiestGuy",
-  color: "white",
-  textShadowColor: "rgba(10, 10, 10, 0.5)",
+  color: "#1b1b1b",
+
+  letterSpacing: 3,
+
+  textAlign: "center",
+
+  textShadowColor: "#9b9999",
   textShadowOffset: {
-    width: 3,
-    height: 3,
+    width: 4,
+    height: 4,
   },
-  textShadowRadius: 1,
-  paddingRight: 3,
+  textShadowRadius: 6,
 },
 
-buttonsText: {
-  color: "#fdfbfb",
-  fontSize: 50,
-  fontFamily: "LilitaOne",
-  textShadowColor: "rgba(8, 8, 8, 0.5)",
+menuButtonText: {
+  fontSize: 38,
+  fontFamily: "LuckiestGuy",
+  color: "#000",
+
+  letterSpacing: 2,
+
+  textShadowColor: "#FFF",
   textShadowOffset: {
-    width: 3,
-    height: 3,
+    width: 2,
+    height: 2,
   },
-  textShadowRadius: 5,
+  textShadowRadius: 2,
 },
-  buttonsGradient: {
-    color: "white",
-    paddingHorizontal: 65,
-    paddingVertical: 30,
-    width: "100%",
-    height: "100%",
-    borderRadius: 100,
-    
-  },
- buttons: {
-  marginTop: 90, // distância entre o título e os botões
+  buttonGradient: {
+  paddingVertical: 18,
   alignItems: "center",
   justifyContent: "center",
-  borderColor: "white"
+  borderRadius: 25,
+},
+menuButton: {
+  width: 360,
+  height: 85,
+  backgroundColor: "rgba(255,255,255,0.88)",
+
+  borderWidth: 4,
+  borderColor: "#000",
+
+  borderRadius: 25,
+
+  justifyContent: "center",
+  alignItems: "center",
+
+  marginVertical: 12,
+
+  shadowColor: "#000",
+  shadowOpacity: 0.35,
+  shadowRadius: 10,
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  elevation: 10,
 },
 
   highscore: {
-  color: "white",
-  fontSize: 25,
-  textAlign: "center",
-  marginTop: 20,
+  marginTop: 18,
+
+  fontSize: 28,
+  fontFamily: "LilitaOne",
+
+  color: "#f8f3f3",
+
+  backgroundColor: "rgba(255,255,255,0.25)",
+
+  paddingHorizontal: 20,
+  paddingVertical: 10,
+
+  borderRadius: 30,
+
+  overflow: "hidden",
+
+  textShadowColor: "#000",
+  textShadowOffset: {
+    width: 2,
+    height: 2,
+  },
+  textShadowRadius: 3,
 },
-  header: {
-  flexDirection: "row",
+ header: {
   alignItems: "center",
   justifyContent: "center",
-  marginTop: -80, // sobe um pouco o título
+  marginTop: -80,
+  width: "100%",
+  position: "relative",
 },
 
 
 bmo: {
+  position: "absolute",
+  left: 100,
   width: 140,
-  height: 140,
-  marginRight: 20,
-},
+  height: 150,
+}
 });

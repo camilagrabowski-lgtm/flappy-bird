@@ -28,7 +28,13 @@ interface Obstacle {
 const { height } = Dimensions.get("window");
 
 export default function Play() {
-  const { velocity, score, setScore } = useGame();
+  const {
+  velocity,
+  score,
+  setScore,
+  addCoin,
+  skinSelecionada,
+} = useGame();
   const [obstacles, setObstacles] = useState([] as Obstacle[]);
   const [started, setStarted] = useState(false);
 
@@ -53,13 +59,24 @@ export default function Play() {
   }
 
   function removeObstacle(id: string) {
-    setScore((oldValue) => ++oldValue);
-    setObstacles((oldValue) => oldValue.filter((item) => item.id !== id));
-    try {
-      pointSound.seekTo(0);
-      pointSound.play();
-    } catch (error) {}
-  }
+  // Soma 1 ponto
+  setScore((oldValue) => oldValue + 1);
+
+  // Soma 1 moeda
+  addCoin();
+
+  // Remove o obstáculo
+  setObstacles((oldValue) =>
+    oldValue.filter((item) => item.id !== id)
+  );
+
+  // Toca o som de ponto
+  try {
+    pointSound.seekTo(0);
+    pointSound.play();
+  } catch (error) {}
+}
+
 
   function randomGapY() {
     const min = CAP_HEIGHT + GAP_SIZE / 2;
@@ -75,7 +92,13 @@ export default function Play() {
     return () => clearInterval(interval);
     }
   }, [started]);
-
+const imagens = {
+  1: require("@/assets/images/bird.gif"),
+  2: require("@/assets/images/jake.png"),
+  3: require("@/assets/images/finn.png"),
+  4: require("@/assets/images/marceline.png"),
+  5: require("@/assets/images/princesa-jujuba.png"),
+};
   return (
     <ImageBackground
       source={require("../assets/images/background.png")}
@@ -85,10 +108,13 @@ export default function Play() {
       <Pressable onPress={handleJump} style={styles.background}>
         <SafeAreaView style={styles.screen}>
           {started ? (
-            <Bird />
-          ) : (
-            <Image source={require("@/assets/images/bird.gif")} style={styles.bird} />
-          )}
+  <Bird />
+) : (
+  <Image
+    source={imagens[skinSelecionada as keyof typeof imagens]}
+    style={styles.bird}
+  />
+)}
 
           {obstacles.map((obstacle) => (
             <Pipe
