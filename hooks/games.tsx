@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { Dimensions } from "react-native";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import { SharedValue, useSharedValue, useFrameCallback } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface GameContextProps {
@@ -39,6 +39,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const birdY = useSharedValue(height / 2);
   const velocity = useSharedValue(0);
+
+  const GRAVITY = 0.5;
+
+useFrameCallback(() => {
+  velocity.value += GRAVITY;
+  birdY.value += velocity.value;
+});
 
   const [score, setScore] = useState(0);
   const [highscore, setHighscore] = useState(0);
